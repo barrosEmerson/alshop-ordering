@@ -24,9 +24,43 @@ public class Customer {
     private OffsetDateTime registeredAt;
     private OffsetDateTime archivedAt;
     private LoyaltPoints loyaltyPoints;
+    private Adress address;
 
-    public Customer(CustomerId id, FullName fullName, LocalDate birthDate, Email email, Phone phone, Document document, Boolean promotionNotificationsAllowed,
-                    Boolean archived, OffsetDateTime registeredAt, OffsetDateTime archivedAt, LoyaltPoints loyaltyPoints) {
+    public static Customer brandNew( FullName fullName, LocalDate birthDate, Email email, Phone phone, Document document, Boolean promotionNotificationsAllowed, Adress address){
+        return new Customer(new CustomerId(),
+                fullName,
+                birthDate,
+                email,
+                phone,
+                document,
+                promotionNotificationsAllowed,
+                false,
+                OffsetDateTime.now(),
+                null,
+                LoyaltPoints.ZERO,
+                address);
+    }
+
+
+    public static Customer existing(CustomerId id, FullName fullName, LocalDate birthDate, Email email, Phone phone, Document document, Boolean promotionNotificationsAllowed,
+                                 Boolean archived, OffsetDateTime registeredAt, OffsetDateTime archivedAt, LoyaltPoints loyaltyPoints, Adress address) {
+        return new Customer(
+                id,
+                fullName,
+                birthDate,
+                email,
+                phone,
+                document,
+                promotionNotificationsAllowed,
+                archived,
+                registeredAt,
+                archivedAt,
+                loyaltyPoints,
+                address);
+    }
+
+    private Customer(CustomerId id, FullName fullName, LocalDate birthDate, Email email, Phone phone, Document document, Boolean promotionNotificationsAllowed,
+                    Boolean archived, OffsetDateTime registeredAt, OffsetDateTime archivedAt, LoyaltPoints loyaltyPoints, Adress address) {
         this.setId(id);
         this.setFullName(fullName);
         this.setBirthDate(birthDate);
@@ -38,19 +72,10 @@ public class Customer {
         this.setRegisteredAt(registeredAt);
         this.setArchivedAt(archivedAt);
         this.setLoyaltyPoints(loyaltyPoints);
+        this.setAddress(address);
     }
 
-    public Customer(CustomerId id, FullName fullName, LocalDate birthDate, Email email, Phone phone, Document document, Boolean promotionNotificationsAllowed, OffsetDateTime registeredAt) {
-        this.setId(id);
-        this.setFullName(fullName);
-        this.setBirthDate(birthDate);
-        this.setEmail(email);
-        this.setPhone(phone);
-        this.setDocument(document);
-        this.setPromotionNotificationsAllowed(promotionNotificationsAllowed);
-        this.setArchived(false);
-        this.setLoyaltyPoints(LoyaltPoints.ZERO);
-    }
+
 
     public void addLoyaltyPoints(LoyaltPoints loyaltyPointsAdded) {
         verifyIfChangeble();
@@ -70,6 +95,10 @@ public class Customer {
         this.setEmail(new Email(UUID.randomUUID() + "@anonymous.com"));
         this.setBirthDate(null);
         this.setPromotionNotificationsAllowed(false);
+        this.setAddress(this.address.toBuilder()
+                .complement(null)
+                .number("Anonymized")
+                .build());
     }
 
     public void enablePromotionNotifications() {
@@ -93,6 +122,11 @@ public class Customer {
     public void changePhone(Phone phone) {
         verifyIfChangeble();
         this.setPhone(phone);
+    }
+
+    public void changeAddress(Adress address) {
+        verifyIfChangeble();
+        this.setAddress(address);
     }
 
     public CustomerId id() {
@@ -137,6 +171,10 @@ public class Customer {
 
     public LoyaltPoints loyaltyPoints() {
         return loyaltyPoints;
+    }
+
+    public Adress address() {
+        return address;
     }
 
     private void setId(CustomerId id) {
@@ -200,6 +238,11 @@ public class Customer {
     private void setLoyaltyPoints(LoyaltPoints loyaltyPoints) {
         Objects.requireNonNull(loyaltyPoints);
         this.loyaltyPoints = loyaltyPoints;
+    }
+
+    public void setAddress(Adress address) {
+        Objects.requireNonNull(address);
+        this.address = address;
     }
 
     private void verifyIfChangeble() {
