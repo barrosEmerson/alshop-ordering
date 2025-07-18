@@ -5,7 +5,7 @@ import lombok.Builder;
 
 import java.util.Objects;
 
-public record Adress(
+public record Address(
         String street,
         String complement,
         String neighborhood,
@@ -17,12 +17,14 @@ public record Adress(
 
 
     @Builder(toBuilder = true)
-    public Adress {
+    public Address {
         FieldValidations.requiresNonBlank(street);
-        FieldValidations.requiresNonBlank(number);
         FieldValidations.requiresNonBlank(neighborhood);
         FieldValidations.requiresNonBlank(city);
+        FieldValidations.requiresNonBlank(number);
         FieldValidations.requiresNonBlank(state);
         Objects.requireNonNull(zipCode);
     }
 }
+
+

@@ -3,6 +3,8 @@ package com.barrostech.algashop.ordering.domain.entity;
 import com.barrostech.algashop.ordering.domain.exception.CustomerArchivedException;
 import com.barrostech.algashop.ordering.domain.validator.FieldValidations;
 import com.barrostech.algashop.ordering.domain.valueobject.*;
+import com.barrostech.algashop.ordering.domain.valueobject.id.CustomerId;
+import lombok.Builder;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -24,9 +26,11 @@ public class Customer {
     private OffsetDateTime registeredAt;
     private OffsetDateTime archivedAt;
     private LoyaltPoints loyaltyPoints;
-    private Adress address;
+    private Address address;
 
-    public static Customer brandNew( FullName fullName, LocalDate birthDate, Email email, Phone phone, Document document, Boolean promotionNotificationsAllowed, Adress address){
+
+    @Builder(builderClassName = "BrandNewCustomerBuid", builderMethodName = "brandNew")
+    private static Customer createBrandNew( FullName fullName, LocalDate birthDate, Email email, Phone phone, Document document, Boolean promotionNotificationsAllowed, Address address){
         return new Customer(new CustomerId(),
                 fullName,
                 birthDate,
@@ -42,25 +46,9 @@ public class Customer {
     }
 
 
-    public static Customer existing(CustomerId id, FullName fullName, LocalDate birthDate, Email email, Phone phone, Document document, Boolean promotionNotificationsAllowed,
-                                 Boolean archived, OffsetDateTime registeredAt, OffsetDateTime archivedAt, LoyaltPoints loyaltyPoints, Adress address) {
-        return new Customer(
-                id,
-                fullName,
-                birthDate,
-                email,
-                phone,
-                document,
-                promotionNotificationsAllowed,
-                archived,
-                registeredAt,
-                archivedAt,
-                loyaltyPoints,
-                address);
-    }
-
+    @Builder(builderClassName = "ExistingCustomerBuild", builderMethodName = "existing")
     private Customer(CustomerId id, FullName fullName, LocalDate birthDate, Email email, Phone phone, Document document, Boolean promotionNotificationsAllowed,
-                    Boolean archived, OffsetDateTime registeredAt, OffsetDateTime archivedAt, LoyaltPoints loyaltyPoints, Adress address) {
+                    Boolean archived, OffsetDateTime registeredAt, OffsetDateTime archivedAt, LoyaltPoints loyaltyPoints, Address address) {
         this.setId(id);
         this.setFullName(fullName);
         this.setBirthDate(birthDate);
@@ -95,7 +83,7 @@ public class Customer {
         this.setEmail(new Email(UUID.randomUUID() + "@anonymous.com"));
         this.setBirthDate(null);
         this.setPromotionNotificationsAllowed(false);
-        this.setAddress(this.address.toBuilder()
+        this.setAddress(this.address().toBuilder()
                 .complement(null)
                 .number("Anonymized")
                 .build());
@@ -124,7 +112,7 @@ public class Customer {
         this.setPhone(phone);
     }
 
-    public void changeAddress(Adress address) {
+    public void changeAddress(Address address) {
         verifyIfChangeble();
         this.setAddress(address);
     }
@@ -173,7 +161,7 @@ public class Customer {
         return loyaltyPoints;
     }
 
-    public Adress address() {
+    public Address address() {
         return address;
     }
 
@@ -240,7 +228,7 @@ public class Customer {
         this.loyaltyPoints = loyaltyPoints;
     }
 
-    public void setAddress(Adress address) {
+    public void setAddress(Address address) {
         Objects.requireNonNull(address);
         this.address = address;
     }
