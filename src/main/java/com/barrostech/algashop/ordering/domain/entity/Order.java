@@ -1,16 +1,14 @@
 package com.barrostech.algashop.ordering.domain.entity;
 
-import com.barrostech.algashop.ordering.domain.valueobject.BillingInfo;
-import com.barrostech.algashop.ordering.domain.valueobject.Money;
-import com.barrostech.algashop.ordering.domain.valueobject.Quantity;
-import com.barrostech.algashop.ordering.domain.valueobject.ShippingInfo;
+import com.barrostech.algashop.ordering.domain.valueobject.*;
 import com.barrostech.algashop.ordering.domain.valueobject.id.CustomerId;
 import com.barrostech.algashop.ordering.domain.valueobject.id.OrderId;
+import com.barrostech.algashop.ordering.domain.valueobject.id.ProductId;
+import lombok.Builder;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class Order {
 
@@ -34,6 +32,7 @@ public class Order {
 
     private Set<OrderItem> items;
 
+    @Builder(builderClassName = "ExistingOrderBuilder", builderMethodName = "existing")
     public Order(OrderId id, CustomerId customerId, Money totalAmount, Quantity totalItems,
                  OffsetDateTime placedAt, OffsetDateTime paidAt, OffsetDateTime cancelledAt,
                  OffsetDateTime readyAt, BillingInfo billing, ShippingInfo shipping,
@@ -54,6 +53,44 @@ public class Order {
         setShippingCost(shippingCost);
         setExpectedDeliveryDate(expectedDeliveryDate);
         setItems(items);
+    }
+
+    public static Order draft(CustomerId customerId){
+        return new Order(
+                new OrderId(),
+                customerId,
+                Money.ZERO,
+                Quantity.ZERO,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                OrderStatus.DRAFT,
+                null,
+                null,
+                null,
+                new HashSet<>()
+        );
+    }
+
+    public void addItem(ProductId productId, ProductName productName,
+                        Money price, Quantity quantity){
+
+        OrderItem item = OrderItem.brandNew()
+                .orderId(this.id)
+                .productId(productId)
+                .productName(productName)
+                .price(price)
+                .quantity(quantity)
+                .build();
+
+        if (this.items == null) {
+            this.items = new HashSet<>();
+        }
+
+        this.items.add(item);
     }
 
     public OrderId id() {
@@ -113,7 +150,7 @@ public class Order {
     }
 
     public Set<OrderItem> items() {
-        return items;
+        return Collections.unmodifiableSet(this.items);
     }
 
     private void setId(OrderId id) {
@@ -153,12 +190,10 @@ public class Order {
     }
 
     private void setBilling(BillingInfo billing) {
-        Objects.requireNonNull(billing);
         this.billing = billing;
     }
 
     private void setShipping(ShippingInfo shipping) {
-        Objects.requireNonNull(shipping);
         this.shipping = shipping;
     }
 
@@ -168,7 +203,6 @@ public class Order {
     }
 
     private void setPaymentMethod(PaymentMethod paymentMethod) {
-        Objects.requireNonNull(paymentMethod);
         this.paymentMethod = paymentMethod;
     }
 

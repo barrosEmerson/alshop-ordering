@@ -6,6 +6,7 @@ import com.barrostech.algashop.ordering.domain.valueobject.Quantity;
 import com.barrostech.algashop.ordering.domain.valueobject.id.OrderId;
 import com.barrostech.algashop.ordering.domain.valueobject.id.OrderItemId;
 import com.barrostech.algashop.ordering.domain.valueobject.id.ProductId;
+import lombok.Builder;
 
 import java.util.Objects;
 
@@ -22,6 +23,7 @@ public class OrderItem {
 
     private Money totalAmount;
 
+    @Builder(builderClassName = "OrderItemBuilder", builderMethodName = "existem")
     public OrderItem(OrderItemId id, OrderId orderId, ProductId productId, ProductName productName,
                      Money price, Quantity quantity, Money totalAmount) {
         setId(id);
@@ -31,6 +33,22 @@ public class OrderItem {
         setPrice(price);
         setQuantity(quantity);
         setTotalAmount(totalAmount);
+    }
+
+
+    @Builder(builderClassName = "BrandNewOrderItemBuilder", builderMethodName = "brandNew")
+    private static OrderItem createBrandNew(OrderId orderId, ProductId productId, ProductName productName,
+                     Money price, Quantity quantity) {
+        return new OrderItem(
+                new OrderItemId(),
+                orderId,
+                productId,
+                productName,
+                price,
+                quantity,
+                Money.ZERO
+        );
+
     }
 
     public OrderItemId id() {
